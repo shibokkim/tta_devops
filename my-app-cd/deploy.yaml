@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-deployment
+  namespace: shibok
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+      - name: fastapi
+        image: ghcr.io/shibokkim/tta_devops/my-app:latest  # GHCR 이미지 경로
+        ports:
+        - containerPort: 8000
+      imagePullSecrets:
+      - name: ghcr-secret  # 생성한 ImagePullSecret 참조
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+  namespace: shibok
+spec:
+  selector:
+    app: fastapi
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+      nodePort: 31200  # NodePort 직접 지정 (예시)
+  type: NodePort
